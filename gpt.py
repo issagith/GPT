@@ -21,10 +21,11 @@ class Head(nn.Module):
         k = self.key(x) # (B,T,C)
         q = self.query(x) # (B,T,C)
         # compute "affinities" called attention score
-        wei = q @ k.T(-2,-1) * C**-0.5 # (B,T,C) @ (B,C,T) --> (B,T,T)
+        wei = q @ k.transpose(-2,-1) * C**-0.5 # (B,T,C) @ (B,C,T) --> (B,T,T)
         wei = wei.masked_fill(self.tril[:T,:T] == 0, float('-inf')) # (B,T,T)
         wei = F.softmax(wei, dim=-1) # (B,T,T)
         # perform the weighted aggregation
         v = self.value(x)
         out = wei @ v # (B,T,T) @ (B,T,C) --> (B,T,C)
         return out 
+
